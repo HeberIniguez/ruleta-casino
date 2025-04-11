@@ -32,43 +32,60 @@ function martingala(){
     echo -ne "${colorAmarillo}[+]${end} Ingrese el credito que desea apostar: " && read initial_bet
     echo -ne "${colorAmarillo}[+]${end} Selecione la opcion a la que apostara continuamente (par/impar): " && read par_impar
 
-    echo -e "\n${colorAmarillo}[+]${end} Vamos a jugar con una cantidad inicial de ${colorAmarillo}$initial_bet$ ${end}a ${colorAmarillo}$par_impar${end}"
+    echo -e "\n${colorAmarillo}[+]${end} La jugada empezo con ${colorAmarillo}$credito$ ${end}de creditos y una apuesta inicial de ${colorAmarillo}$initial_bet$ ${end}creditos a ${colorAmarillo}$par_impar${end}"
 
     backup_bet=$initial_bet
+    play_counter=1
+    bad_counter=0
+    bad_plays="[ "
+    max_reward=$credito
 
     tput civis # Ocultar cursor
     while true; do
         if [ "$credito" -le "$initial_bet" ]; then
-            echo -e "\n${colorAmarillo}[!]${end} ${colorRojo}Tu credito es insuficiente.${end}"
-            echo -e "${colorAmarillo}[!]${end} La apuesta es de ${colorAmarillo}$initial_bet$ ${end}y solo te quedan ${colorAmarillo}${credito}$ ${end}"
+            echo -e "${colorRojo}[!] Tu credito es insuficiente.${end}"
+            # echo -e "${colorAmarillo}[!]${end} La apuesta es de ${colorAmarillo}$initial_bet$ ${end}y solo te quedan ${colorAmarillo}${credito}$ ${end}"
+            echo -e "${colorAmarillo}[+]${end} Se realizaron ${colorAmarillo}$play_counter${end} jugadas en total."
+            echo -e "${colorAmarillo}[+]${end} La ganacia maxima fue de ${colorAmarillo}$(($max_reward-$credito))$ ${end}"
+            echo -e "${colorAmarillo}[+]${end} La mala racha de ${colorAmarillo}$bad_counter${end} jugadas consecutivas fue: ${colorRojo}$bad_plays${end}"
             tput cnorm; exit 0
         fi
 
         credito=$(($credito-$initial_bet))
-        echo -e "Acabas de apostar ${colorAmarillo}$initial_bet${end} y tu nuevo credito es de ${colorAmarillo}$credito${end}"
+        # echo -e "Acabas de apostar ${colorAmarillo}$initial_bet${end} y tu nuevo credito es de ${colorAmarillo}$credito${end}"
 
         numeroAleatorio="$(($RANDOM % 37))"
-        echo -e "\n${colorAmarillo}[+]${end} Ha salido el numero ${colorAzul}$numeroAleatorio${end}"
+        # echo -e "\n${colorAmarillo}[+]${end} Ha salido el numero ${colorAzul}$numeroAleatorio${end}"
 
         if [ "$par_impar" == "par" ]; then
             if [ "$(($numeroAleatorio % 2))" -eq 0 ]; then
                 if [ "$numeroAleatorio" -eq 0 ]; then
-                    echo -e "${colorRojo}[!]${end} Ha salido el numero 0, por lo tanto has ${colorRojo}PERDIDO!${end}"
+                    # echo -e "${colorRojo}[!]${end} Ha salido el numero 0, por lo tanto has ${colorRojo}PERDIDO!${end}"
+                    bad_plays+="$numeroAleatorio "
+                    let bad_counter+=1
                 else
-                    echo -e "${colorAmarillo}[+]${end} El numero que ha salido es ${colorAmarillo}PAR${end}, has ${colorVerde}GANADO!${end}"
+                    # echo -e "${colorAmarillo}[+]${end} El numero que ha salido es ${colorAmarillo}PAR${end}, has ${colorVerde}GANADO!${end}"
                     reward=$(($initial_bet*2))
-                    echo -e "${colorVerde}[+] Ganaste un total de ${end}${colorAmarillo}$reward$ ${end}"
+                    # echo -e "${colorVerde}[+] Ganaste un total de ${end}${colorAmarillo}$reward$ ${end}"
                     credito=$(($credito+$reward))
-                    echo -e "${colorAmarillo}[+]${end} Tu nuevo credito es de ${colorAmarillo}$credito$ ${end}"
+                    # echo -e "${colorAmarillo}[+]${end} Tu nuevo credito es de ${colorAmarillo}$credito$ ${end}"
                     initial_bet=$backup_bet
+                    bad_plays=""
+                    bad_counter=0
                 fi
             else
-                echo -e "${colorRojo}[!]${end} El numero que ha salido es ${colorAmarillo}IMPAR${end}, has ${colorRojo}PERDIDO! ${end}"
+                # echo -e "${colorRojo}[!]${end} El numero que ha salido es ${colorAmarillo}IMPAR${end}, has ${colorRojo}PERDIDO! ${end}"
                 initial_bet=$((initial_bet*2))
-                echo -e "${colorAmarillo}[+]${end} Tu nuevo credito es de ${colorAmarillo}$credito$ ${end}"
+                # echo -e "${colorAmarillo}[+]${end} Tu nuevo credito es de ${colorAmarillo}$credito$ ${end}"
+                bad_plays+="$numeroAleatorio "
+                let bad_counter+=1
             fi 
         fi    
-        sleep 2
+
+        if [ ! "$credito" -le "$max_reward" ]; then
+            max_reward=$credito
+        fi
+        let play_counter+=1
     done
     tput cnorm # Recuperar cursor
 }
