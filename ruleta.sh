@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#Colores
+# Colores
 end="\033[0m\e[0m"
 colorRojo="\e[0;31m\033[1m"
 colorVerde="\e[0;32m\033[1m"
@@ -13,6 +13,7 @@ colorGris="\e[0;37m\033[1m"
 # Funcion para salir del programa
 function ctrl_c(){
     echo -e "\n\n${colorRojo}[!] Saliendo... ${end}\n"
+    tput cnorm
     exit 1
 }
 
@@ -27,7 +28,30 @@ function helpPanel(){
 }
 
 function martingala(){
-    echo -e "\n[+] Vamos a jugar con la tecnica martingala\n"
+    echo -e "\n${colorAmarillo}[+]${end} Credito actual: ${colorAmarillo}$credito$ ${end}"
+    echo -ne "${colorAmarillo}[+]${end} Ingrese el credito que desea apostar: " && read initial_bet
+    echo -ne "${colorAmarillo}[+]${end} Selecione la opcion a la que apostara continuamente (par/impar): " && read par_impar
+
+    echo -e "\n${colorAmarillo}[+]${end} 20Vamos a jugar con una cantidad inicial de ${colorAmarillo}$initial_bet$ ${end}a ${colorAmarillo}$par_impar${end}"
+
+    tput civis # Ocultar cursor
+    while true; do
+        numeroAleatorio="$(($RANDOM % 37))"
+        echo -e "\n${colorAmarillo}[+]${end} Ha salido el numero ${colorAzul}$numeroAleatorio${end}"
+
+        if [ "$(($numeroAleatorio % 2))" -eq 0 ]; then
+            if [ "$numeroAleatorio" -eq 0 ]; then
+                echo -e "${colorAmarillo}[+]${end} Ha salido el numero 0, por lo tanto hemos ${colorRojo}PERDIDO${end}"
+            else
+                echo -e "${colorAmarillo}[+]${end} El numero que ha salido es ${colorAmarillo}PAR${end}"
+            fi
+        else
+            echo -e "${colorAmarillo}[+]${end} El numero que ha salido es ${colorAmarillo}IMPAR${end}"
+        fi
+
+        sleep 0.4
+    done
+    tput cnorm # Recuperar cursor
 }
 
 while getopts "c:t:h" args; do 
