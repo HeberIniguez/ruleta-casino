@@ -111,25 +111,41 @@ function inverseLabrouchere(){
 
     echo -e "\n${colorAmarillo}[+]${end} Comenzamos con la secuencia ${colorVerde}[${mi_secuencia[@]}]${end}"
 
-    bet=$((${mi_secuencia[0]} + ${mi_secuencia[-1]}))
-    unset mi_secuencia[0]
-    unset mi_secuencia[-1]
-
-    mi_secuencia=(${mi_secuencia[@]}) 
-
-    echo -e "${colorAmarillo}[+]${end} Invertimos ${colorAmarillo}\$${bet} ${end}creditos y nuestra secuencia queda en ${colorVerde}[${mi_secuencia[@]}]${end}"
-
+    bet=$((${mi_secuencia[0]} + ${mi_secuencia[-1]})) 
+    
     tput civis
     while true; do
     numeroAleatorio=$(($RANDOM % 37))
+    credito=$(($credito - $bet))
 
+    echo -e "\n${colorAmarillo}[+]${end} Invertimos ${colorAmarillo}\$${bet} ${end}creditos"
+    echo -e "${colorAmarillo}[+]${end} Tenemos: ${colorAmarillo}\$$credito${end}"
     echo -e "\n${colorAmarillo}[+]${end} Ha salido el numero ${colorAzul}$numeroAleatorio${end}"
 
     if [ "$par_impar" == "par" ]; then
-        if [ "$(($numeroAleatorio % 2))" -eq 0 ]; then
+        if [ "$(($numeroAleatorio % 2))" -eq 0 ] && [ "$numeroAleatorio" -ne 0 ]; then
             echo -e "${colorAmarillo}[+]${end} El numero que ha salido es ${colorAmarillo}PAR${end}, has ${colorVerde}GANADO!${end}"
+            reward=$(($bet * 2))
+            let credito+=$reward
+            echo -e "${colorAmarillo}[+]${end} Tienes ${colorAmarillo}\$$credito${end}"
+
+            mi_secuencia+=($bet)
+
+            echo -e "${colorAmarillo}[+]${end} Nuestra nueva secuencia es: ${colorVerde}[${mi_secuencia[@]}]${end}"
+
+            if [ "${#mi_secuencia[@]}" -ne 1 ]; then
+                bet=$((${mi_secuencia[0]} + ${mi_secuencia[-1]}))
+            elif [ "${#mi_secuencia[@]}" -eq 1 ]; then
+                bet=${mi_secuencia[0]}
+            fi
+
+        elif [ "$numeroAleatorio" -eq 0 ]; then
+            echo -e "${colorRojo}[!]${end} Ha salido el numero ${colorAmarillo}0${end}, has ${colorRojo}PERDIDO! ${end}"
         else
             echo -e "${colorRojo}[!]${end} El numero que ha salido es ${colorAmarillo}IMPAR${end}, has ${colorRojo}PERDIDO! ${end}"
+            unset mi_secuencia[0]
+            unset mi_secuencia[-1]
+            mi_secuencia=(${mi_secuencia[@]})
         fi
     fi
 
