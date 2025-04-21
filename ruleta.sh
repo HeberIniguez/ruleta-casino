@@ -130,26 +130,46 @@ function inverseLabrouchere(){
             echo -e "${colorAmarillo}[+]${end} Tienes ${colorAmarillo}\$$credito${end}"
 
             mi_secuencia+=($bet)
+            mi_secuencia=(${mi_secuencia[@]})
 
             echo -e "${colorAmarillo}[+]${end} Nuestra nueva secuencia es: ${colorVerde}[${mi_secuencia[@]}]${end}"
 
-            if [ "${#mi_secuencia[@]}" -ne 1 ]; then
+            if [ "${#mi_secuencia[@]}" -gt 1 ]; then
                 bet=$((${mi_secuencia[0]} + ${mi_secuencia[-1]}))
             elif [ "${#mi_secuencia[@]}" -eq 1 ]; then
+                echo "${#mi_secuencia[@]}"
                 bet=${mi_secuencia[0]}
             fi
 
         elif [ "$numeroAleatorio" -eq 0 ]; then
             echo -e "${colorRojo}[!]${end} Ha salido el numero ${colorAmarillo}0${end}, has ${colorRojo}PERDIDO! ${end}"
+
         else
             echo -e "${colorRojo}[!]${end} El numero que ha salido es ${colorAmarillo}IMPAR${end}, has ${colorRojo}PERDIDO! ${end}"
+
             unset mi_secuencia[0]
-            unset mi_secuencia[-1]
+            unset mi_secuencia[-1] 2>/dev/null
+
             mi_secuencia=(${mi_secuencia[@]})
+
+            echo -e "${colorAmarillo}[+]${end} La nueva secuencia es: ${colorVerde}[${mi_secuencia[@]}]${end}"
+            
+            if [ "${#mi_secuencia[@]}" -gt 1 ]; then
+                bet=$((${mi_secuencia[0]} + ${mi_secuencia[-1]}))
+            elif [ "${#mi_secuencia[@]}" -eq 1 ]; then
+                bet=${mi_secuencia[0]}
+            fi
+      
+            if [ "${#mi_secuencia[@]}" -eq 0 ]; then
+                echo -e "${colorRojo}[!] Hemos perdido la secuencia${end}"
+                mi_secuencia=(1 2 3 4)
+                echo -e "${colorAmarillo}[+]${end} Secuencia restablecida a ${colorVerde}[${mi_secuencia[@]}]${end}"
+                bet=$((${mi_secuencia[0]} + ${mi_secuencia[-1]}))
+            fi
         fi
     fi
 
-    sleep 5
+    sleep 3
     done
     tput cnorm
 }
