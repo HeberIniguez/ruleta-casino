@@ -115,6 +115,16 @@ function inverseLabrouchere(){
     
     tput civis
     while true; do
+    
+    if [ "$credito" -lt "$bet" ]; then
+        echo -e "${colorRojo}[!] Tu credito es insuficiente.${end}"
+        echo -e "${colorAmarillo}[!]${end} La apuesta es de ${colorAmarillo}$bet$ ${end}y solo te quedan ${colorAmarillo}${credito}$ ${end}"
+        # echo -e "${colorAmarillo}[+]${end} Se realizaron ${colorAmarillo}$(($play_counter-1))${end} jugadas en total."
+        # echo -e "${colorAmarillo}[+]${end} La ganacia maxima fue de ${colorAmarillo}$(($max_reward-$credito))$ ${end} creditos."
+        # echo -e "${colorAmarillo}[+]${end} La mala racha de ${colorAmarillo}$bad_counter${end} jugadas consecutivas fue: ${colorRojo}[ $bad_plays]${end}"
+        tput cnorm; exit 0
+    fi
+    
     numeroAleatorio=$(($RANDOM % 37))
     credito=$(($credito - $bet))
 
@@ -124,7 +134,7 @@ function inverseLabrouchere(){
 
     if [ "$par_impar" == "par" ]; then
         if [ "$(($numeroAleatorio % 2))" -eq 0 ] && [ "$numeroAleatorio" -ne 0 ]; then
-            echo -e "${colorAmarillo}[+]${end} El numero que ha salido es ${colorAmarillo}PAR${end}, has ${colorVerde}GANADO!${end}"
+            echo -e "${colorAmarillo}[+]${end} El numero que ha salido es ${colorVerde}PAR${end}, has ${colorVerde}GANADO!${end}"
             reward=$(($bet * 2))
             let credito+=$reward
             echo -e "${colorAmarillo}[+]${end} Tienes ${colorAmarillo}\$$credito${end}"
@@ -141,11 +151,13 @@ function inverseLabrouchere(){
                 bet=${mi_secuencia[0]}
             fi
 
-        elif [ "$numeroAleatorio" -eq 0 ]; then
-            echo -e "${colorRojo}[!]${end} Ha salido el numero ${colorAmarillo}0${end}, has ${colorRojo}PERDIDO! ${end}"
+        elif [ "$(($numeroAleatorio % 2))" -eq 1 ] || [ "$numeroAleatorio" -eq 0 ]; then
 
-        else
-            echo -e "${colorRojo}[!]${end} El numero que ha salido es ${colorAmarillo}IMPAR${end}, has ${colorRojo}PERDIDO! ${end}"
+            if [ "$numeroAleatorio" -eq 0 ]; then
+                echo -e "${colorRojo}[!]${end} Ha salido el numero ${colorRojo}0${end}, has ${colorRojo}PERDIDO! ${end}"
+            else
+                echo -e "${colorRojo}[!]${end} El numero que ha salido es ${colorRojo}IMPAR${end}, has ${colorRojo}PERDIDO! ${end}"
+            fi
 
             unset mi_secuencia[0]
             unset mi_secuencia[-1] 2>/dev/null
@@ -169,7 +181,7 @@ function inverseLabrouchere(){
         fi
     fi
 
-    sleep 3
+    # sleep 1
     done
     tput cnorm
 }
