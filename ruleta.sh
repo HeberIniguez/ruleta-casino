@@ -113,13 +113,19 @@ function inverseLabrouchere(){
 
     bet=$((${mi_secuencia[0]} + ${mi_secuencia[-1]})) 
     
+    plays_counter=1
+    bad_counter=0
+    bad_plays=""
+    max_reward=$credito
+    bet_to_renew=$(($credito + 50)) #Dinero una vez alcanzado renovemos la secuencia.
+
     tput civis
     while true; do
-    
+
     if [ "$credito" -lt "$bet" ]; then
         echo -e "${colorRojo}[!] Tu credito es insuficiente.${end}"
         echo -e "${colorAmarillo}[!]${end} La apuesta es de ${colorAmarillo}$bet$ ${end}y solo te quedan ${colorAmarillo}${credito}$ ${end}"
-        # echo -e "${colorAmarillo}[+]${end} Se realizaron ${colorAmarillo}$(($play_counter-1))${end} jugadas en total."
+        echo -e "${colorAmarillo}[+]${end} Se realizaron ${colorAmarillo}$(($plays_counter-1))${end} jugadas en total."
         # echo -e "${colorAmarillo}[+]${end} La ganacia maxima fue de ${colorAmarillo}$(($max_reward-$credito))$ ${end} creditos."
         # echo -e "${colorAmarillo}[+]${end} La mala racha de ${colorAmarillo}$bad_counter${end} jugadas consecutivas fue: ${colorRojo}[ $bad_plays]${end}"
         tput cnorm; exit 0
@@ -141,6 +147,14 @@ function inverseLabrouchere(){
 
             mi_secuencia+=($bet)
             mi_secuencia=(${mi_secuencia[@]})
+
+            if [ $credito -ge $bet_to_renew ]; then
+                echo -e "[+] Se ha superado el tope establecido"
+                let bet_to_renew+=50
+                echo -e "[+] El tope se ha restablecido en \$$bet_to_renew"
+                mi_secuencia=(1 2 3 4)
+                bet=$((${mi_secuencia[0]} + ${mi_secuencia[-1]}))
+            fi
 
             echo -e "${colorAmarillo}[+]${end} Nuestra nueva secuencia es: ${colorVerde}[${mi_secuencia[@]}]${end}"
 
@@ -181,7 +195,7 @@ function inverseLabrouchere(){
         fi
     fi
 
-    # sleep 1
+    let plays_counter+=1
     done
     tput cnorm
 }
